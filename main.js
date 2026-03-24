@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen, systemPreferences } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, systemPreferences, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { uIOhook, UiohookKey } = require('uiohook-napi');
@@ -52,8 +52,11 @@ function createStatusIconWindow() {
     },
   });
   statusIconWindow.setPosition(dx + dw - 232, dy + 10);
-  // Start click-through so transparent areas don't block mouse events
   statusIconWindow.setIgnoreMouseEvents(true, { forward: true });
+  if (process.platform === 'darwin') {
+    statusIconWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    statusIconWindow.setAlwaysOnTop(true, 'floating');
+  }
   statusIconWindow.loadFile('status-icon.html');
   statusIconWindow.show();
 }
@@ -73,6 +76,10 @@ function createReminderWindow() {
       nodeIntegration: false,
     },
   });
+  if (process.platform === 'darwin') {
+    reminderWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    reminderWindow.setAlwaysOnTop(true, 'floating');
+  }
   reminderWindow.loadFile('reminder.html');
 }
 
@@ -94,6 +101,11 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
+
+  if (process.platform === 'darwin') {
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    mainWindow.setAlwaysOnTop(true, 'floating');
+  }
 
   mainWindow.on('blur', () => {
     if (overlayVisible) {
@@ -341,8 +353,14 @@ app.whenReady().then(() => {
   if (process.platform === 'darwin') {
     const trusted = systemPreferences.isTrustedAccessibilityClient(false);
     if (!trusted) {
-      // Prompt opens System Preferences > Security & Privacy > Accessibility
-      systemPreferences.isTrustedAccessibilityClient(true);
+      systemPreferences.isTrustedAccessibilityClient(true); // opens System Preferences
+      dialog.showMessageBoxSync({
+        type: 'info',
+        title: 'Accessibility Permission Required',
+        message: 'RU needs Accessibility access to detect the R+U hotkey.',
+        detail: 'Go to System Settings → Privacy & Security → Accessibility → enable RU.\n\nThen restart the app.',
+        buttons: ['OK'],
+      });
     }
   }
 
