@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RU Reminder</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: transparent;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      user-select: none;
+      -webkit-app-region: no-drag;
+    }
+
+    body.visible { opacity: 1; }
+
+    .card {
+      background: rgba(22, 27, 34, 0.96);
+      border: 1px solid rgba(136, 176, 225, 0.25);
+      border-radius: 14px;
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .label {
+      color: #88b0e1;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .bar-track {
+      width: 180px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: #88b0e1;
+      border-radius: 2px;
+      width: 0%;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="label">RU in session</span>
+    <div class="bar-track">
+      <div class="bar-fill" id="fill"></div>
+    </div>
+  </div>
+  <script src="reminder-renderer.js"></script>
+</body>
+</html>

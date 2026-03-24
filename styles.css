@@ -1,0 +1,342 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: transparent;
+  user-select: none;
+  -webkit-app-region: drag;
+  overflow: hidden;
+}
+
+.container {
+  background: rgba(22, 27, 34, 0.94);
+  border-radius: 16px;
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 420px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  transition: opacity 0.6s ease;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  animation: fadeIn 0.25s ease;
+}
+
+.screen.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+  color: #e6edf3;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.subtitle {
+  color: #8b949e;
+  font-size: 18px;
+}
+
+.label {
+  color: #8b949e;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+textarea {
+  -webkit-app-region: no-drag;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #c9d1d9;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 10px 12px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+textarea:focus {
+  border-color: rgba(136, 176, 225, 0.4);
+}
+
+textarea::placeholder {
+  color: #484f58;
+}
+
+.btn {
+  -webkit-app-region: no-drag;
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: rgba(100, 148, 207, 0.25);
+  color: #88b0e1;
+  border: 1px solid rgba(100, 148, 207, 0.2);
+}
+
+.btn-primary:hover {
+  background: rgba(100, 148, 207, 0.35);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #484f58;
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+.btn-secondary:hover {
+  color: #8b949e;
+}
+
+.timer {
+  font-size: 64px;
+  font-weight: 300;
+  color: #e6edf3;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+}
+
+.timer-sub {
+  color: #484f58;
+  font-size: 13px;
+}
+
+/* Command prompt input */
+.prompt-row {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 10px;
+}
+
+.prompt-chevron {
+  color: #88b0e1;
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.prompt-input {
+  -webkit-app-region: no-drag;
+  background: transparent;
+  border: none;
+  color: #c9d1d9;
+  font-family: inherit;
+  font-size: 16px;
+  width: 100%;
+  outline: none;
+  caret-color: #88b0e1;
+}
+
+.prompt-input::placeholder {
+  color: #484f58;
+}
+
+/* Widget task label */
+.widget-task {
+  display: none;
+  color: #6e7681;
+  font-size: 16px;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+body.widget .widget-task {
+  display: block;
+}
+
+/* Friction options row */
+.friction-row {
+  -webkit-app-region: no-drag;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.friction-btn {
+  height: 38px;
+  font-size: 12px;
+}
+
+/* Widget mode — compact timer in corner */
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+body.widget .container {
+  min-height: unset;
+  width: 100%;
+  max-width: 100%;
+  padding: 10px 16px;
+  border-radius: 10px;
+  gap: 4px;
+}
+
+body.widget .timer {
+  font-size: 24px;
+  letter-spacing: 0px;
+}
+
+/* Tap buttons */
+.tap-row {
+  -webkit-app-region: no-drag;
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  gap: 4px;
+  width: 100%;
+}
+
+.tap-btn {
+  -webkit-app-region: no-drag;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #8b949e;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.tap-btn:hover {
+  background: rgba(136, 176, 225, 0.15);
+  color: #c9d1d9;
+}
+
+.tap-btn.active {
+  background: rgba(136, 176, 225, 0.35);
+  border-color: #88b0e1;
+  color: #e6edf3;
+}
+
+/* Duration grid */
+.duration-grid {
+  -webkit-app-region: no-drag;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.duration-grid .btn {
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+/* Review yes/no */
+.review-yn {
+  -webkit-app-region: no-drag;
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.btn-yn {
+  -webkit-app-region: no-drag;
+  flex: 1;
+  padding: 14px 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #8b949e;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-yn:hover {
+  background: rgba(136, 176, 225, 0.15);
+  color: #c9d1d9;
+}
+
+.btn-yn.active {
+  background: rgba(136, 176, 225, 0.35);
+  border-color: #88b0e1;
+  color: #e6edf3;
+}
+
+/* Optional text input (review screen) */
+.text-input {
+  -webkit-app-region: no-drag;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #c9d1d9;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.text-input:focus {
+  border-color: rgba(136, 176, 225, 0.4);
+}
+
+.text-input::placeholder {
+  color: #484f58;
+}
+
+/* Tighter gap on review screen to fit all elements */
+#screen-review {
+  gap: 10px;
+}
+
+/* Post-sprint sub-sections need same flex layout as .screen */
+#post-task-check,
+#post-resistance,
+#post-retry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}

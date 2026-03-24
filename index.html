@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RU</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container" id="main-container">
+
+    <!-- Screen 1: Welcome -->
+    <div id="screen-welcome" class="screen active">
+      <p id="welcome-nudge" class="subtitle"></p>
+      <div id="welcome-timer" class="timer timer-display">1:30</div>
+      <div class="prompt-row">
+        <span class="prompt-chevron">›</span>
+        <input type="text" id="attention-text" class="prompt-input" placeholder="what's your first step?" autocomplete="off" spellcheck="false">
+      </div>
+      <button id="btn-not-now" class="btn btn-secondary">Not now</button>
+    </div>
+
+    <!-- Screen 2: Sprint (widget) -->
+    <div id="screen-sprint" class="screen">
+      <div id="timer-display" class="timer timer-display">1:30</div>
+    </div>
+
+    <!-- Screen 3: Post-Sprint -->
+    <div id="screen-post" class="screen">
+
+      <!-- Part A: task check — only shown if they set a focus task -->
+      <div id="post-task-check">
+        <h1 id="post-heading"></h1>
+        <div class="review-yn">
+          <button id="btn-started-yes" class="btn-yn">YES</button>
+          <button id="btn-started-no" class="btn-yn">NO</button>
+        </div>
+      </div>
+
+      <!-- Part B: resistance + continue — shown after YES, or immediately if no task -->
+      <div id="post-resistance" style="display:none;">
+        <h1>Good. Build the momentum.</h1>
+        <p class="subtitle">How hard was it to start?</p>
+        <div class="tap-row" id="tap-resist-before">
+          <button class="tap-btn" data-val="0">0</button>
+          <button class="tap-btn" data-val="1">1</button>
+          <button class="tap-btn" data-val="2">2</button>
+          <button class="tap-btn" data-val="3">3</button>
+          <button class="tap-btn" data-val="4">4</button>
+          <button class="tap-btn" data-val="5">5</button>
+          <button class="tap-btn" data-val="6">6</button>
+          <button class="tap-btn" data-val="7">7</button>
+          <button class="tap-btn" data-val="8">8</button>
+          <button class="tap-btn" data-val="9">9</button>
+          <button class="tap-btn" data-val="10">10</button>
+        </div>
+        <button id="btn-3min" class="btn btn-primary">+3 min</button>
+        <button id="btn-done-post" class="btn btn-secondary">Done</button>
+      </div>
+
+      <!-- Part C: retry — shown after NO -->
+      <div id="post-retry" style="display:none;">
+        <h1>What got in the way?</h1>
+        <div class="friction-row">
+          <button class="tap-btn friction-btn" data-val="distraction">Distraction</button>
+          <button class="tap-btn friction-btn" data-val="unclear">Unclear task</button>
+          <button class="tap-btn friction-btn" data-val="not-ready">Not ready</button>
+        </div>
+        <button id="btn-retry-90" class="btn btn-primary">Another 90 seconds</button>
+        <button id="btn-give-up" class="btn btn-secondary">Done for now</button>
+      </div>
+
+    </div>
+
+    <!-- Screen 4: Momentum (widget, 3 min) -->
+    <div id="screen-momentum" class="screen">
+      <div id="momentum-timer-display" class="timer timer-display">3:00</div>
+    </div>
+
+    <!-- Screen 5: Between Blocks -->
+    <div id="screen-between" class="screen">
+      <h1>Nice work. RU locked in?</h1>
+      <p class="subtitle">Focus level</p>
+      <div class="tap-row" id="tap-between-focus">
+        <button class="tap-btn" data-val="0">0</button>
+        <button class="tap-btn" data-val="1">1</button>
+        <button class="tap-btn" data-val="2">2</button>
+        <button class="tap-btn" data-val="3">3</button>
+        <button class="tap-btn" data-val="4">4</button>
+        <button class="tap-btn" data-val="5">5</button>
+        <button class="tap-btn" data-val="6">6</button>
+        <button class="tap-btn" data-val="7">7</button>
+        <button class="tap-btn" data-val="8">8</button>
+        <button class="tap-btn" data-val="9">9</button>
+        <button class="tap-btn" data-val="10">10</button>
+      </div>
+      <textarea id="between-dump" placeholder="What's on your mind? (park it here)" rows="2"></textarea>
+      <div class="duration-grid">
+        <button class="btn btn-primary dur-btn" data-min="5">+5 min</button>
+        <button class="btn btn-primary dur-btn" data-min="10">+10 min</button>
+        <button class="btn btn-primary dur-btn" data-min="15">+15 min</button>
+        <button class="btn btn-primary dur-btn" data-min="20">+20 min</button>
+        <button class="btn btn-primary dur-btn" data-min="25">+25 min</button>
+        <button class="btn btn-primary dur-btn" data-min="30">+30 min</button>
+        <button class="btn btn-primary dur-btn" data-min="40">+40 min</button>
+        <button class="btn btn-primary dur-btn" data-min="45">+45 min</button>
+        <button class="btn btn-primary dur-btn" data-min="50">+50 min</button>
+        <button class="btn btn-primary dur-btn" data-min="60">+60 min</button>
+      </div>
+      <button id="btn-end-session" class="btn btn-secondary">Done for now</button>
+    </div>
+
+    <!-- Screen 6: Custom Timer (widget) -->
+    <div id="screen-custom" class="screen">
+      <div id="custom-timer-display" class="timer timer-display">0:00</div>
+    </div>
+
+    <!-- Screen 7: Session Review -->
+    <div id="screen-review" class="screen">
+      <h1>Session complete.</h1>
+      <p class="subtitle">Did RU help you break resistance?</p>
+      <div class="review-yn">
+        <button id="btn-yes" class="btn-yn">YES</button>
+        <button id="btn-no" class="btn-yn">NO</button>
+      </div>
+      <p class="subtitle">Focus quality this session</p>
+      <div class="tap-row" id="tap-focus-quality">
+        <button class="tap-btn" data-val="0">0</button>
+        <button class="tap-btn" data-val="1">1</button>
+        <button class="tap-btn" data-val="2">2</button>
+        <button class="tap-btn" data-val="3">3</button>
+        <button class="tap-btn" data-val="4">4</button>
+        <button class="tap-btn" data-val="5">5</button>
+        <button class="tap-btn" data-val="6">6</button>
+        <button class="tap-btn" data-val="7">7</button>
+        <button class="tap-btn" data-val="8">8</button>
+        <button class="tap-btn" data-val="9">9</button>
+        <button class="tap-btn" data-val="10">10</button>
+      </div>
+      <p class="subtitle">Mental clarity now</p>
+      <div class="tap-row" id="tap-clarity">
+        <button class="tap-btn" data-val="0">0</button>
+        <button class="tap-btn" data-val="1">1</button>
+        <button class="tap-btn" data-val="2">2</button>
+        <button class="tap-btn" data-val="3">3</button>
+        <button class="tap-btn" data-val="4">4</button>
+        <button class="tap-btn" data-val="5">5</button>
+        <button class="tap-btn" data-val="6">6</button>
+        <button class="tap-btn" data-val="7">7</button>
+        <button class="tap-btn" data-val="8">8</button>
+        <button class="tap-btn" data-val="9">9</button>
+        <button class="tap-btn" data-val="10">10</button>
+      </div>
+      <input type="text" id="distracting-note" class="text-input" placeholder="Anything distracting you? (optional)">
+      <button id="btn-review-done" class="btn btn-primary">Done</button>
+    </div>
+
+    <div id="widget-task" class="widget-task"></div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>

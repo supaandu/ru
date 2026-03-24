@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      user-select: none;
+      overflow: hidden;
+      width: 220px;
+      height: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    /* Collapsed: small icon pinned top-right */
+    .icon-wrap {
+      width: 54px;
+      height: 54px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.25;
+      transition: opacity 0.5s ease;
+      cursor: pointer;
+    }
+    .icon-wrap:hover { opacity: 1; }
+
+    .icon-dot {
+      width: 46px;
+      height: 46px;
+      background: rgba(22, 27, 34, 0.93);
+      border: 1px solid rgba(136, 176, 225, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .icon-label {
+      color: #88b0e1;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* Expanded: stats card */
+    .card {
+      display: none;
+      background: rgba(22, 27, 34, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      width: 210px;
+      margin-top: 4px;
+    }
+
+    /* Score hero */
+    .score-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .score-label {
+      color: #484f58;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .score-value {
+      font-size: 38px;
+      font-weight: 200;
+      font-variant-numeric: tabular-nums;
+      color: #e6edf3;
+      line-height: 1;
+    }
+
+    .score-max {
+      color: #484f58;
+      font-size: 13px;
+      margin-left: 2px;
+    }
+
+    /* Score bar */
+    .score-bar-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      margin-bottom: 14px;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: #88b0e1;
+      transition: width 0.4s ease;
+    }
+
+    /* Sub-metrics */
+    .metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .metric-label { color: #484f58; font-size: 11px; }
+
+    .metric-value {
+      color: #8b949e;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-unit { color: #30363d; font-size: 10px; margin-left: 2px; }
+
+    .bail-value { color: #f85149; }
+
+    .btn-quit {
+      width: 100%;
+      padding: 7px 0;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      color: #484f58;
+      font-size: 12px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-quit:hover { color: #8b949e; border-color: rgba(255, 255, 255, 0.15); }
+  </style>
+</head>
+<body>
+  <div class="icon-wrap" id="icon-wrap">
+    <div class="icon-dot">
+      <span class="icon-label">RU</span>
+    </div>
+  </div>
+
+  <div class="card" id="card">
+    <div class="score-row">
+      <span class="score-label">Locked In</span>
+      <span>
+        <span class="score-value" id="score">—</span><span class="score-max">/100</span>
+      </span>
+    </div>
+    <div class="score-bar-track">
+      <div class="score-bar-fill" id="score-bar" style="width:0%"></div>
+    </div>
+    <div class="metrics">
+      <div class="metric">
+        <span class="metric-label">Showed up</span>
+        <span class="metric-value"><span id="starts">—</span><span class="metric-unit"> starts</span></span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Focused</span>
+        <span class="metric-value"><span id="minutes">—</span><span class="metric-unit"> min</span></span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Avg to begin</span>
+        <span class="metric-value"><span id="speed">—</span><span class="metric-unit"> sec</span></span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Bailed</span>
+        <span class="metric-value bail-value"><span id="bails">—</span><span class="metric-unit"> times</span></span>
+      </div>
+    </div>
+    <button class="btn-quit" id="btn-quit">Quit RU</button>
+  </div>
+
+  <script src="status-icon-renderer.js"></script>
+</body>
+</html>
