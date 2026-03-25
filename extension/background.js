@@ -31,6 +31,8 @@ function connectWS() {
         } else if (msg.type === 'session-end') {
           sessionActive = false;
           chrome.storage.local.set({ sessionActive: false });
+        } else if (msg.type === 'block-list-update') {
+          chrome.storage.sync.set({ blockList: msg.blockList });
         }
       } catch {}
     };

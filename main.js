@@ -4,7 +4,23 @@ const fs = require('fs');
 const { uIOhook, UiohookKey } = require('uiohook-napi');
 const { WebSocketServer } = require('ws');
 
-const SESSIONS_PATH = path.join(app.getPath('userData'), 'sessions.json');
+const SESSIONS_PATH   = path.join(app.getPath('userData'), 'sessions.json');
+const BLOCKLIST_PATH  = path.join(app.getPath('userData'), 'blocklist.json');
+const DEFAULT_BLOCK_LIST = [
+  'youtube.com', 'reddit.com', 'twitter.com', 'x.com',
+  'instagram.com', 'chess.com', 'tiktok.com', 'facebook.com',
+  'twitch.tv', 'netflix.com',
+];
+
+function loadBlockList() {
+  try { return JSON.parse(fs.readFileSync(BLOCKLIST_PATH, 'utf-8')); }
+  catch { return [...DEFAULT_BLOCK_LIST]; }
+}
+
+function saveBlockList(list) {
+  fs.writeFileSync(BLOCKLIST_PATH, JSON.stringify(list), 'utf-8');
+  wsBroadcast({ type: 'block-list-update', blockList: list });
+}
 let mainWindow = null;
 let reminderWindow = null;
 let statusIconWindow = null;
@@ -41,7 +57,7 @@ function createStatusIconWindow() {
   const { x: dx, y: dy, width: dw } = display.workArea;
   statusIconWindow = new BrowserWindow({
     width: 220,
-    height: 260,
+    height: 480,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -193,6 +209,8 @@ function startWSServer() {
   wss = new WebSocketServer({ port: 54321 });
   wss.on('connection', (client) => {
     wsClients.add(client);
+    // Send current block list to newly connected extension
+    client.send(JSON.stringify({ type: 'block-list-update', blockList: loadBlockList() }));
     client.on('message', (data) => {
       try {
         const msg = JSON.parse(data);
@@ -293,6 +311,13 @@ ipcMain.handle('show-status-icon', () => {
 
 ipcMain.handle('quit-app', () => {
   app.quit();
+});
+
+ipcMain.handle('get-block-list', () => loadBlockList());
+
+ipcMain.handle('save-block-list', (_e, list) => {
+  saveBlockList(list);
+  return true;
 });
 
 ipcMain.handle('add-stats', (_e, { starts = 0, minutes = 0, firstStepMs = null, bails = 0 }) => {

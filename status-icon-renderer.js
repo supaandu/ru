@@ -99,3 +99,57 @@ document.addEventListener('click', (e) => {
 quitBtn.addEventListener('click', () => {
   window.statusApi.quitApp();
 });
+
+// --- Block list ---
+let blockList = [];
+let blocksOpen = false;
+const sectionHeader = document.getElementById('section-header');
+const blocksSection = document.getElementById('blocks-section');
+const blockListEl   = document.getElementById('block-list-el');
+const blockAddInput = document.getElementById('block-add-input');
+const btnAddDomain  = document.getElementById('btn-add-domain');
+const sectionArrow  = document.getElementById('section-arrow');
+const blockCount    = document.getElementById('block-count');
+
+async function loadBlockList() {
+  blockList = await window.statusApi.getBlockList();
+  renderBlockList();
+}
+
+function renderBlockList() {
+  blockCount.textContent = `(${blockList.length})`;
+  blockListEl.innerHTML = '';
+  blockList.forEach((domain) => {
+    const item = document.createElement('div');
+    item.className = 'block-item';
+    item.innerHTML = `<span class="block-domain">${domain}</span><button class="btn-remove" data-d="${domain}">×</button>`;
+    item.querySelector('.btn-remove').addEventListener('click', () => removeDomain(domain));
+    blockListEl.appendChild(item);
+  });
+}
+
+function removeDomain(domain) {
+  blockList = blockList.filter((d) => d !== domain);
+  window.statusApi.saveBlockList(blockList);
+  renderBlockList();
+}
+
+function addDomain() {
+  const raw = blockAddInput.value.trim().toLowerCase()
+    .replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+  if (!raw || blockList.includes(raw)) { blockAddInput.value = ''; return; }
+  blockList = [...blockList, raw];
+  window.statusApi.saveBlockList(blockList);
+  blockAddInput.value = '';
+  renderBlockList();
+}
+
+sectionHeader.addEventListener('click', () => {
+  blocksOpen = !blocksOpen;
+  blocksSection.style.display = blocksOpen ? 'flex' : 'none';
+  sectionArrow.textContent = blocksOpen ? '˅' : '›';
+  if (blocksOpen) loadBlockList();
+});
+
+btnAddDomain.addEventListener('click', addDomain);
+blockAddInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addDomain(); });

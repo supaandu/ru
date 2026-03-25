@@ -11,13 +11,12 @@
       user-select: none;
       overflow: hidden;
       width: 220px;
-      height: 260px;
+      height: 480px;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
     }
 
-    /* Collapsed: small icon pinned top-right */
     .icon-wrap {
       width: 54px;
       height: 54px;
@@ -50,7 +49,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Expanded: stats card */
     .card {
       display: none;
       background: rgba(22, 27, 34, 0.96);
@@ -62,14 +60,13 @@
       margin-top: 4px;
     }
 
-    /* Score hero */
+    /* Score */
     .score-row {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       margin-bottom: 14px;
     }
-
     .score-label {
       color: #484f58;
       font-size: 10px;
@@ -77,7 +74,6 @@
       letter-spacing: 1.5px;
       text-transform: uppercase;
     }
-
     .score-value {
       font-size: 38px;
       font-weight: 200;
@@ -85,14 +81,8 @@
       color: #e6edf3;
       line-height: 1;
     }
+    .score-max { color: #484f58; font-size: 13px; margin-left: 2px; }
 
-    .score-max {
-      color: #484f58;
-      font-size: 13px;
-      margin-left: 2px;
-    }
-
-    /* Score bar */
     .score-bar-track {
       width: 100%;
       height: 3px;
@@ -100,7 +90,6 @@
       border-radius: 2px;
       margin-bottom: 14px;
     }
-
     .score-bar-fill {
       height: 100%;
       border-radius: 2px;
@@ -108,32 +97,120 @@
       transition: width 0.4s ease;
     }
 
-    /* Sub-metrics */
+    /* Metrics */
     .metrics {
       display: flex;
       flex-direction: column;
       gap: 7px;
       margin-bottom: 14px;
     }
-
-    .metric {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-
+    .metric { display: flex; justify-content: space-between; align-items: baseline; }
     .metric-label { color: #484f58; font-size: 11px; }
-
-    .metric-value {
-      color: #8b949e;
-      font-size: 12px;
-      font-variant-numeric: tabular-nums;
-    }
-
+    .metric-value { color: #8b949e; font-size: 12px; font-variant-numeric: tabular-nums; }
     .metric-unit { color: #30363d; font-size: 10px; margin-left: 2px; }
-
     .bail-value { color: #f85149; }
 
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 12px 0;
+    }
+
+    /* Block list section */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 2px 0;
+    }
+    .section-title {
+      color: #484f58;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .section-toggle-btn {
+      color: #484f58;
+      font-size: 11px;
+      transition: color 0.15s;
+    }
+    .section-header:hover .section-title,
+    .section-header:hover .section-toggle-btn { color: #8b949e; }
+
+    .blocks-section {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .block-list-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 130px;
+      overflow-y: auto;
+    }
+    .block-list-inner::-webkit-scrollbar { width: 3px; }
+    .block-list-inner::-webkit-scrollbar-track { background: transparent; }
+    .block-list-inner::-webkit-scrollbar-thumb { background: #30363d; border-radius: 2px; }
+
+    .block-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.03);
+      border-radius: 6px;
+      padding: 5px 8px;
+    }
+    .block-domain { color: #6e7681; font-size: 11px; }
+    .btn-remove {
+      background: none;
+      border: none;
+      color: #30363d;
+      cursor: pointer;
+      font-size: 13px;
+      line-height: 1;
+      padding: 0;
+      transition: color 0.15s;
+    }
+    .btn-remove:hover { color: #f85149; }
+
+    .add-row {
+      display: flex;
+      gap: 5px;
+      margin-top: 2px;
+    }
+    .add-input {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 6px;
+      padding: 5px 8px;
+      color: #e6edf3;
+      font-size: 11px;
+      font-family: inherit;
+      outline: none;
+    }
+    .add-input::placeholder { color: #30363d; }
+    .add-input:focus { border-color: rgba(136,176,225,0.25); }
+
+    .btn-add-domain {
+      background: rgba(136,176,225,0.12);
+      border: none;
+      border-radius: 6px;
+      padding: 5px 9px;
+      color: #88b0e1;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-add-domain:hover { background: rgba(136,176,225,0.22); }
+
+    /* Bottom buttons */
     .btn-quit {
       width: 100%;
       padding: 7px 0;
@@ -183,6 +260,22 @@
         <span class="metric-value bail-value"><span id="bails">—</span><span class="metric-unit"> times</span></span>
       </div>
     </div>
+
+    <div class="divider"></div>
+
+    <div class="section-header" id="section-header">
+      <span class="section-title">Blocked Sites <span id="block-count"></span></span>
+      <span class="section-toggle-btn" id="section-arrow">›</span>
+    </div>
+    <div class="blocks-section" id="blocks-section">
+      <div class="block-list-inner" id="block-list-el"></div>
+      <div class="add-row">
+        <input class="add-input" id="block-add-input" placeholder="youtube.com" autocomplete="off" />
+        <button class="btn-add-domain" id="btn-add-domain">+</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
     <button class="btn-quit" id="btn-quit">Quit RU</button>
   </div>
 
