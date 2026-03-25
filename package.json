@@ -21,7 +21,15 @@
       "perMachine": false
     },
     "mac": {
-      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
       "category": "public.app-category.productivity",
       "entitlementsInherit": "entitlements.mac.plist"
     },
@@ -38,6 +46,7 @@
     "electron-builder": "^26.8.1"
   },
   "dependencies": {
-    "uiohook-napi": "^1.5.4"
+    "uiohook-napi": "^1.5.4",
+    "ws": "^8.20.0"
   }
 }

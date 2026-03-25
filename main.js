@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, screen, systemPreferences, dialog } = requi
 const path = require('path');
 const fs = require('fs');
 const { uIOhook, UiohookKey } = require('uiohook-napi');
+const { WebSocketServer } = require('ws');
 
 const SESSIONS_PATH = path.join(app.getPath('userData'), 'sessions.json');
 let mainWindow = null;
@@ -184,6 +185,36 @@ function pushStatsToIcon() {
   });
 }
 
+// --- WebSocket server for browser extension ---
+let wss = null;
+const wsClients = new Set();
+
+function startWSServer() {
+  wss = new WebSocketServer({ port: 54321 });
+  wss.on('connection', (client) => {
+    wsClients.add(client);
+    client.on('message', (data) => {
+      try {
+        const msg = JSON.parse(data);
+        if (msg.type === 'launch-ru') {
+          showOverlay();
+          // Pre-fill the attention text after window is shown
+          setTimeout(() => {
+            if (mainWindow) mainWindow.webContents.send('pre-fill-task', msg.firstStep || '');
+          }, 300);
+        }
+      } catch {}
+    });
+    client.on('close', () => wsClients.delete(client));
+    client.on('error', () => wsClients.delete(client));
+  });
+}
+
+function wsBroadcast(msg) {
+  const data = JSON.stringify(msg);
+  wsClients.forEach((c) => { if (c.readyState === 1) c.send(data); });
+}
+
 // Session storage
 function loadSessions() {
   try {
@@ -223,6 +254,7 @@ ipcMain.handle('set-widget-mode', () => {
   mainWindow.setContentBounds({ x: dx + 20, y: dy + 20, width: 160, height: 80 }, false);
   startProximityPoll();
   setTimeout(() => mainWindow.setOpacity(1), 80);
+  wsBroadcast({ type: 'session-start' });
   return true;
 });
 
@@ -308,6 +340,7 @@ ipcMain.handle('set-normal-mode', () => {
   mainWindow.setContentBounds({ x: 0, y: 0, width: 420, height: 430 }, false);
   mainWindow.center();
   setTimeout(() => mainWindow.setOpacity(1), 80);
+  wsBroadcast({ type: 'session-end' });
   return true;
 });
 
@@ -368,6 +401,7 @@ app.whenReady().then(() => {
   createReminderWindow();
   createStatusIconWindow();
   setupKeyboardHook();
+  startWSServer();
 });
 
 // macOS: re-show status icon if user clicks dock icon (though dock is hidden, handle activate anyway)

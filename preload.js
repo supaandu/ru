@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('api', {
   setNormalMode: () => ipcRenderer.invoke('set-normal-mode'),
   onCursorProximity: (cb) => ipcRenderer.on('cursor-proximity', (_e, near) => cb(near)),
   onRuTriggered: (cb) => ipcRenderer.on('ru-triggered', cb),
+  onPreFillTask: (cb) => ipcRenderer.on('pre-fill-task', (_e, text) => cb(text)),
   showReminder: (pct) => ipcRenderer.invoke('show-reminder', pct),
   hideStatusIcon: () => ipcRenderer.invoke('hide-status-icon'),
   showStatusIcon: () => ipcRenderer.invoke('show-status-icon'),

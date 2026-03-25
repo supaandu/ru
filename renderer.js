@@ -380,6 +380,13 @@ document.getElementById('btn-review-done').addEventListener('click', () => {
 });
 
 // --- RU reminder ---
+window.api.onPreFillTask((text) => {
+  if (text) {
+    attentionText.value = text;
+    attentionText.dispatchEvent(new Event('input'));
+  }
+});
+
 window.api.onRuTriggered(() => {
   if (!timerInterval || reminderCooldown) return;
   const pct = activeTimerTotal > 0 ? (activeTimerElapsed / activeTimerTotal) * 100 : 0;
