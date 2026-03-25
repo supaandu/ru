@@ -8,10 +8,9 @@ const DEFAULT_BLOCK_LIST = [
 let ws = null;
 let sessionActive = false;
 
-// Persist session state so it survives service worker restarts
-chrome.storage.local.get(['sessionActive'], (r) => {
-  sessionActive = r.sessionActive || false;
-});
+// Always reset session on extension startup — if app was closed mid-session it would be stuck
+sessionActive = false;
+chrome.storage.local.set({ sessionActive: false });
 
 // --- WebSocket connection to Electron app ---
 function connectWS() {
@@ -39,6 +38,9 @@ function connectWS() {
 
     ws.onclose = () => {
       ws = null;
+      // App disconnected — no session can be running
+      sessionActive = false;
+      chrome.storage.local.set({ sessionActive: false });
       setTimeout(connectWS, 5000);
     };
 

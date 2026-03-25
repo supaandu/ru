@@ -59,3 +59,15 @@ toggleEl.addEventListener('change', () => {
   toggleLabel.textContent = enabled ? 'on' : 'off';
   chrome.runtime.sendMessage({ type: 'set-blocking-enabled', enabled });
 });
+
+// Live-update popup when storage changes (e.g. Electron app updates block list)
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'sync' && changes.blockList) {
+    blockList = changes.blockList.newValue;
+    renderList();
+  }
+  if (area === 'sync' && changes.blockingEnabled !== undefined) {
+    toggleEl.checked = changes.blockingEnabled.newValue;
+    toggleLabel.textContent = changes.blockingEnabled.newValue ? 'on' : 'off';
+  }
+});
