@@ -34,8 +34,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
-      - name: Ad-hoc sign app bundle
-        run: codesign --force --deep --sign - "dist/mac/RU.app"
       - uses: actions/upload-artifact@v4
         with:
           name: RU-Mac

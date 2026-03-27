@@ -35,11 +35,21 @@ if (mode === 'hard') {
   function launchRU() {
     const firstStep = input.value.trim();
     if (!firstStep) return;
-    btnStart.disabled = true;
-    btnStart.textContent = 'Launching...';
-    chrome.runtime.sendMessage({ type: 'launch-ru', firstStep }, () => {
-      // Close this tab after launching
-      window.close();
+    chrome.runtime.sendMessage({ type: 'get-state' }, (res) => {
+      if (!res || !res.wsConnected) {
+        btnStart.textContent = 'Open the RU app first';
+        btnStart.disabled = false;
+        setTimeout(() => {
+          btnStart.textContent = 'Start session';
+          btnStart.disabled = input.value.trim().length === 0;
+        }, 2500);
+        return;
+      }
+      btnStart.disabled = true;
+      btnStart.textContent = 'Launching...';
+      chrome.runtime.sendMessage({ type: 'launch-ru', firstStep }, () => {
+        window.close();
+      });
     });
   }
 }

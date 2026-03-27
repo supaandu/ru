@@ -26,7 +26,6 @@ window.statusApi.onStatsUpdate((stats) => {
 function expand() {
   expanded = true;
   card.style.display = 'block';
-  // Full window is interactive when expanded
   window.statusApi.setClickThrough(false);
   loadStats();
 }
@@ -153,3 +152,20 @@ sectionHeader.addEventListener('click', () => {
 
 btnAddDomain.addEventListener('click', addDomain);
 blockAddInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addDomain(); });
+
+function setBlockListLocked(locked) {
+  const label = document.getElementById('block-list-lock');
+  blockAddInput.disabled = locked;
+  btnAddDomain.disabled = locked;
+  blockAddInput.placeholder = locked ? 'unlock after session ends' : 'e.g. twitch.tv';
+  if (label) label.style.display = locked ? 'block' : 'none';
+  document.querySelectorAll('.btn-remove').forEach((b) => { b.style.pointerEvents = locked ? 'none' : ''; b.style.opacity = locked ? '0.3' : ''; });
+}
+
+window.statusApi.onSessionState((active) => setBlockListLocked(active));
+
+window.statusApi.onBlockListUpdated((list) => {
+  blockList = list;
+  if (blocksOpen) renderBlockList();
+});
+

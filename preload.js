@@ -14,4 +14,5 @@ contextBridge.exposeInMainWorld('api', {
   hideStatusIcon: () => ipcRenderer.invoke('hide-status-icon'),
   showStatusIcon: () => ipcRenderer.invoke('show-status-icon'),
   addStats: (data) => ipcRenderer.invoke('add-stats', data),
+  startSession: () => ipcRenderer.invoke('start-session'),
 });

@@ -21,6 +21,7 @@ function saveBlockList(list) {
   fs.writeFileSync(BLOCKLIST_PATH, JSON.stringify(list), 'utf-8');
   wsBroadcast({ type: 'block-list-update', blockList: list });
 }
+
 let mainWindow = null;
 let reminderWindow = null;
 let statusIconWindow = null;
@@ -204,22 +205,25 @@ function pushStatsToIcon() {
 // --- WebSocket server for browser extension ---
 let wss = null;
 const wsClients = new Set();
+let sessionInProgress = false;
 
 function startWSServer() {
   wss = new WebSocketServer({ port: 54321 });
   wss.on('connection', (client) => {
     wsClients.add(client);
-    // Send current block list to newly connected extension
     client.send(JSON.stringify({ type: 'block-list-update', blockList: loadBlockList() }));
+    if (sessionInProgress) client.send(JSON.stringify({ type: 'session-start' }));
     client.on('message', (data) => {
       try {
         const msg = JSON.parse(data);
         if (msg.type === 'launch-ru') {
           showOverlay();
-          // Pre-fill the attention text after window is shown
           setTimeout(() => {
             if (mainWindow) mainWindow.webContents.send('pre-fill-task', msg.firstStep || '');
           }, 300);
+        } else if (msg.type === 'save-block-list') {
+          saveBlockList(msg.blockList);
+          if (statusIconWindow) statusIconWindow.webContents.send('block-list-updated', msg.blockList);
         }
       } catch {}
     });
@@ -257,8 +261,19 @@ ipcMain.handle('save-session', (_event, data) => {
 
 ipcMain.handle('close-overlay', () => {
   hideOverlay();
+  sessionInProgress = false;
+  wsBroadcast({ type: 'session-end' });
+  if (statusIconWindow) statusIconWindow.webContents.send('session-state', false);
   return true;
 });
+
+ipcMain.handle('start-session', () => {
+  sessionInProgress = true;
+  wsBroadcast({ type: 'session-start' });
+  if (statusIconWindow) statusIconWindow.webContents.send('session-state', true);
+  return true;
+});
+
 
 ipcMain.handle('load-sessions', () => {
   return loadSessions();
@@ -272,7 +287,6 @@ ipcMain.handle('set-widget-mode', () => {
   mainWindow.setContentBounds({ x: dx + 20, y: dy + 20, width: 160, height: 80 }, false);
   startProximityPoll();
   setTimeout(() => mainWindow.setOpacity(1), 80);
-  wsBroadcast({ type: 'session-start' });
   return true;
 });
 
@@ -365,7 +379,6 @@ ipcMain.handle('set-normal-mode', () => {
   mainWindow.setContentBounds({ x: 0, y: 0, width: 420, height: 430 }, false);
   mainWindow.center();
   setTimeout(() => mainWindow.setOpacity(1), 80);
-  wsBroadcast({ type: 'session-end' });
   return true;
 });
 
@@ -398,7 +411,16 @@ function setupKeyboardHook() {
     }
   });
 
-  uIOhook.start();
+  try {
+    uIOhook.start();
+  } catch (err) {
+    console.error('uIOhook failed to start (accessibility permission may be missing):', err);
+  }
+}
+
+// Prevent multiple instances — second launch quits immediately
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
 }
 
 app.whenReady().then(() => {
@@ -407,11 +429,16 @@ app.whenReady().then(() => {
     app.dock.hide();
   }
 
+  createWindow();
+  createReminderWindow();
+  createStatusIconWindow();
+  startWSServer();
+
   // macOS: uiohook-napi requires Accessibility permission to capture global keys
   if (process.platform === 'darwin') {
     const trusted = systemPreferences.isTrustedAccessibilityClient(false);
     if (!trusted) {
-      systemPreferences.isTrustedAccessibilityClient(true); // opens System Preferences
+      systemPreferences.isTrustedAccessibilityClient(true); // prompts System Preferences
       dialog.showMessageBoxSync({
         type: 'info',
         title: 'Accessibility Permission Required',
@@ -419,14 +446,13 @@ app.whenReady().then(() => {
         detail: 'Go to System Settings → Privacy & Security → Accessibility → enable RU.\n\nThen restart the app.',
         buttons: ['OK'],
       });
+      // Don't start the keyboard hook — app needs to restart after permission is granted
+    } else {
+      setupKeyboardHook();
     }
+  } else {
+    setupKeyboardHook();
   }
-
-  createWindow();
-  createReminderWindow();
-  createStatusIconWindow();
-  setupKeyboardHook();
-  startWSServer();
 });
 
 // macOS: re-show status icon if user clicks dock icon (though dock is hidden, handle activate anyway)

@@ -118,6 +118,7 @@ function enterWidgetMode() {
   container.style.transition = 'none';
   container.style.opacity = '0';
   window.api.hideStatusIcon();
+  window.api.startSession();
   window.api.setWidgetMode().then(() => {
     container.style.transition = '';
     showWidget();

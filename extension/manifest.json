@@ -3,7 +3,7 @@
   "name": "RU",
   "version": "1.0.0",
   "description": "Block distracting sites and redirect your energy.",
-  "permissions": ["tabs", "storage", "webNavigation"],
+  "permissions": ["tabs", "storage", "webNavigation", "alarms"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"

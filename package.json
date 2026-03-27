@@ -31,8 +31,10 @@
         }
       ],
       "category": "public.app-category.productivity",
+      "entitlements": "entitlements.mac.plist",
       "entitlementsInherit": "entitlements.mac.plist"
     },
+    "afterPack": "scripts/afterPack.js",
     "files": [
       "**/*"
     ],
