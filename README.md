@@ -4,6 +4,52 @@ A lightweight Electron overlay that helps you start tasks when you're feeling re
 
 ---
 
+## Installing (Windows)
+
+1. Download `RU Setup 1.0.0.exe` from the latest GitHub Actions build
+2. Run the installer — Windows SmartScreen may warn "unrecognized app"
+   - Click **More info** → **Run anyway**
+3. RU starts automatically after install
+
+---
+
+## Installing (Mac)
+
+### Step 1 — Open the app
+
+1. Download the correct DMG for your Mac:
+   - **Apple Silicon (M1/M2/M3):** `RU-1.0.0-arm64.dmg`
+   - **Intel Mac:** `RU-1.0.0.dmg`
+2. Open the DMG and drag RU to your Applications folder
+3. Try to open RU — macOS will block it with "cannot be opened because Apple cannot check it for malicious software"
+4. Go to **System Settings → Privacy & Security** → scroll down → click **Open Anyway** next to RU
+5. Confirm by clicking **Open** in the dialog
+
+### Step 2 — Grant Accessibility permission (required for R+U hotkey)
+
+The R+U global hotkey requires Accessibility access. Without it the widget shows up but the hotkey does nothing.
+
+1. On first launch, RU will open System Settings automatically
+2. Go to **System Settings → Privacy & Security → Accessibility**
+3. Find **RU** in the list and toggle it **on**
+4. **Restart the app** — the hotkey will not work until you restart
+
+> If you dismissed the prompt and the hotkey isn't working, manually go to System Settings → Privacy & Security → Accessibility and add RU.
+
+### Step 3 — Install the Chrome extension (optional, for tab blocking)
+
+The Chrome extension is not on the Web Store yet. To install it manually:
+
+1. Download the `extension` folder from this repo (or the release)
+2. Open Chrome and go to `chrome://extensions`
+3. Enable **Developer mode** (toggle in the top right)
+4. Click **Load unpacked** and select the `extension` folder
+5. The RU Blocker extension is now active
+
+> To allow blocking in Incognito: click the RU extension → Details → Allow in Incognito
+
+---
+
 ## How It Works
 
 **Global hotkey:** Hold `R + U` anywhere on your computer to summon the overlay.
@@ -11,80 +57,62 @@ A lightweight Electron overlay that helps you start tasks when you're feeling re
 ### Flow
 
 ```
-[Welcome] → [90s Sprint] → [Post-Sprint] → [3min Extended] → [Done]
-                ↓                  ↓
-           (widget mode)      (full overlay)
+[Welcome] → [90s Sprint] → [Post-Sprint] → [Review] → [Done]
+                ↓
+           (widget mode — shrinks to corner)
 ```
 
-1. **Welcome** — Optionally type what you'll focus on, then hit "Start 90 seconds" (or dismiss with "Not now")
-2. **Sprint** — Window shrinks to a small corner widget showing the countdown. Do the thing.
-3. **Post-Sprint** — Rate your resistance before/after (0–10 sliders). Choose to keep going 3 more minutes or stop.
-4. **Extended** — Another compact corner widget for the 3-minute block.
-5. **Final** — Session complete screen, then closes.
+1. **Welcome** — Type what you'll focus on, then hit Enter or "Start 90 seconds"
+2. **Sprint** — Window shrinks to a small corner widget showing the countdown
+3. **Post-Sprint** — Did you start? Keep going or end the session
+4. **Review** — Rate the session, then done
 
 ---
 
-## UI
+## Status Icon Widget
 
-- Frameless, transparent, always-on-top overlay
-- **Normal mode:** 420×360px, centered on screen (welcome / post / final screens)
-- **Widget mode:** 200×72px, top-right corner, draggable — active during 90s and 3min timers
-- Dark theme (`rgba(22, 27, 34, 0.94)` background)
+A small **RU** dot lives in the corner of your screen at all times. Click it to expand your daily stats:
+
+- **Locked In score** (0–100)
+- Sessions started, minutes focused, avg time to begin, bails
+- **Blocked Sites** — add/remove domains from the block list
+- Quit RU button
+
+The widget syncs the block list with any connected Chrome extensions automatically.
 
 ---
 
-## Data Tracking
+## Browser Tab Blocking
 
-Sessions are saved to `sessions.json` in the project directory. Each session records:
+The Chrome extension blocks distracting sites with two modes:
 
-| Field | Type | Description |
-|---|---|---|
-| `timestamp` | ISO string | When the session was triggered |
-| `started` | boolean | Whether the user clicked "Start" or dismissed |
-| `completed` | boolean | Whether the 90s sprint finished |
-| `continued3min` | boolean | Whether the user opted into the extended block |
-| `resistanceBefore` | 0–10 or null | Self-reported resistance before starting |
-| `resistanceAfter` | 0–10 or null | Self-reported resistance after the sprint |
-| `attentionText` | string | What the user said they'd focus on |
+- **Soft block** (outside sessions) — "RU avoiding something?" with a first-step prompt to launch a session
+- **Hard block** (during sessions) — "Session in progress. Stay with it."
 
-**No dashboard or analytics yet** — the data is there but visualization/export hasn't been built.
+The block list is managed from the RU widget and syncs to all connected browsers. During a session, the block list and toggle are locked.
 
 ---
 
 ## Stack
 
 - **Electron** v41 — app shell, frameless window, IPC
-- **uiohook-napi** v1.5 — global keyboard hook (works outside the app window)
-- Vanilla JS / HTML / CSS — no frontend framework
+- **uiohook-napi** v1.5 — global keyboard hook
+- **ws** — WebSocket server for extension bridge
+- Vanilla JS / HTML / CSS
 
 ---
 
-## Running
+## Running from source
 
 ```bash
 npm install
 npm start
 ```
 
----
+## Building
 
-## File Structure
-
-```
-main.js          # Electron main process — window management, keyboard hook, IPC handlers
-renderer.js      # UI logic — screen transitions, timer, session state
-preload.js       # Context bridge — exposes safe IPC calls to renderer
-index.html       # Screen markup (welcome, sprint, post, extended, final)
-styles.css       # Styles including widget-mode compact layout
-sessions.json    # Persisted session data (auto-created)
+```bash
+npm run dist
 ```
 
----
-
-## Potential Next Steps
-
-- Session history viewer / stats dashboard
-- Streak tracking
-- Configurable timer durations
-- Sound/notification when timer ends
-- Export sessions to CSV
+Or push to `main` — GitHub Actions builds Windows and Mac automatically.
