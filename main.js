@@ -127,7 +127,8 @@ function createWindow() {
 
   mainWindow.on('blur', () => {
     if (overlayVisible) {
-      mainWindow.setAlwaysOnTop(true);
+      const level = process.platform === 'darwin' ? 'floating' : undefined;
+      mainWindow.setAlwaysOnTop(true, level);
     }
   });
 }
@@ -461,10 +462,9 @@ app.on('activate', () => {
 });
 
 app.on('will-quit', () => {
-  uIOhook.stop();
+  try { uIOhook.stop(); } catch {}
 });
 
-app.on('window-all-closed', (e) => {
+app.on('window-all-closed', () => {
   // Don't auto-quit when main/reminder windows close — status icon keeps app alive
-  e.preventDefault();
 });

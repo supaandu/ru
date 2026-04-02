@@ -168,4 +168,3 @@ window.statusApi.onBlockListUpdated((list) => {
   blockList = list;
   if (blocksOpen) renderBlockList();
 });
-

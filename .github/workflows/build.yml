@@ -38,3 +38,66 @@ jobs:
         with:
           name: RU-Mac
           path: dist/*.dmg
+
+  release:
+    needs: [build-windows, build-mac]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: RU-Windows
+          path: dist-windows
+
+      - name: Download Mac artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: RU-Mac
+          path: dist-mac
+
+      - name: Get short SHA
+        id: sha
+        run: echo "short=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Delete existing latest release
+        run: gh release delete latest --yes --cleanup-tag || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release with downloads
+        run: |
+          gh release create latest \
+            --title "RU — latest build (${{ steps.sha.outputs.short }})" \
+            --notes "$(cat <<'EOF'
+          ## Download
+
+          | Platform | File |
+          |----------|------|
+          | Windows | \`RU Setup.exe\` |
+          | Mac (Apple Silicon) | \`RU-arm64.dmg\` |
+          | Mac (Intel) | \`RU-x64.dmg\` |
+
+          ### Mac install
+          1. Download the DMG for your chip (Apple Silicon = arm64, Intel = x64)
+          2. Open the DMG and drag RU to Applications
+          3. First launch: right-click → Open → Open (bypasses Gatekeeper)
+          4. Go to System Settings → Privacy & Security → Accessibility → enable RU
+          5. Restart RU — the R+U hotkey is now active
+
+          ### Windows install
+          1. Download \`RU Setup.exe\` and run it
+          2. If SmartScreen appears, click "More info" → "Run anyway"
+
+          ### Browser extension
+          Download the \`extension\` folder from the repo and load it as an unpacked extension in Chrome.
+          EOF
+          )" \
+            --latest \
+            dist-windows/*.exe \
+            dist-mac/*.dmg
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
