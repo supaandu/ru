@@ -15,4 +15,6 @@ contextBridge.exposeInMainWorld('api', {
   showStatusIcon: () => ipcRenderer.invoke('show-status-icon'),
   addStats: (data) => ipcRenderer.invoke('add-stats', data),
   startSession: () => ipcRenderer.invoke('start-session'),
+  getTasks: () => ipcRenderer.invoke('get-tasks'),
+  onTaskUpdated: (cb) => ipcRenderer.on('task-updated', (_e, tasks) => cb(tasks)),
 });

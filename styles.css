@@ -175,17 +175,21 @@ textarea::placeholder {
 /* Widget task label */
 .widget-task {
   display: none;
-  color: #6e7681;
-  font-size: 16px;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: center;
 }
 
 body.widget .widget-task {
   display: block;
+  color: #6e7681;
+  font-size: 13px;
+  align-self: stretch;
+  text-align: center;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.5;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  padding: 6px 10px;
+  flex: 1;
 }
 
 /* Friction options row */
@@ -212,14 +216,18 @@ body.widget .container {
   min-height: unset;
   width: 100%;
   max-width: 100%;
-  padding: 10px 16px;
+  height: 100%;
+  padding: 10px 14px 12px;
   border-radius: 10px;
-  gap: 4px;
+  gap: 0;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 body.widget .timer {
   font-size: 24px;
   letter-spacing: 0px;
+  margin-bottom: 8px;
 }
 
 /* Tap buttons */

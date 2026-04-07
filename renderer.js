@@ -21,7 +21,17 @@ const NUDGES = [
   'RU tired? Small step.'
 ];
 
-let reminderTimeout = null;
+let reminderTimeout  = null;
+let showingTaskLabel = false;
+
+function updateWidgetTask(tasks) {
+  if (!showingTaskLabel) return;
+  const first = tasks.find((t) => !t.done);
+  widgetTask.textContent = first ? first.text : '';
+}
+
+window.api.getTasks().then((tasks) => updateWidgetTask(tasks));
+window.api.onTaskUpdated((tasks) => updateWidgetTask(tasks));
 
 const screens = {
   welcome:  document.getElementById('screen-welcome'),
@@ -215,6 +225,7 @@ function resetSession() {
   activeTimerTotal     = 0;
   activeTimerElapsed   = 0;
   reminderCooldown     = false;
+  showingTaskLabel     = false;
   container.style.opacity    = '1';
   container.style.transition = '';
   document.body.classList.remove('widget');
@@ -332,6 +343,8 @@ document.getElementById('btn-give-up').addEventListener('click', () => {
 document.getElementById('btn-3min').addEventListener('click', () => {
   session.resistanceBefore = selectedTap('tap-resist-before');
   currentBlockDuration = 3;
+  showingTaskLabel = true;
+  window.api.getTasks().then((tasks) => updateWidgetTask(tasks));
   enterWidget('momentum', 180, () => {
     clearTapRow('tap-between-focus');
     showScreen('between');
@@ -347,6 +360,8 @@ document.querySelectorAll('.dur-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     commitBlock();
     currentBlockDuration = parseInt(btn.dataset.min);
+    showingTaskLabel = true;
+    window.api.getTasks().then((tasks) => updateWidgetTask(tasks));
     enterWidget('custom', currentBlockDuration * 60, () => {
       clearTapRow('tap-between-focus');
       showScreen('between');

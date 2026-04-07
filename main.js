@@ -6,6 +6,16 @@ const { WebSocketServer } = require('ws');
 
 const SESSIONS_PATH   = path.join(app.getPath('userData'), 'sessions.json');
 const BLOCKLIST_PATH  = path.join(app.getPath('userData'), 'blocklist.json');
+const TASKS_PATH      = path.join(app.getPath('userData'), 'tasks.json');
+
+function loadTasks() {
+  try { return JSON.parse(fs.readFileSync(TASKS_PATH, 'utf-8')); }
+  catch { return []; }
+}
+
+function saveTasks(tasks) {
+  fs.writeFileSync(TASKS_PATH, JSON.stringify(tasks), 'utf-8');
+}
 const DEFAULT_BLOCK_LIST = [
   'youtube.com', 'reddit.com', 'twitter.com', 'x.com',
   'instagram.com', 'chess.com', 'tiktok.com', 'facebook.com',
@@ -25,6 +35,7 @@ function saveBlockList(list) {
 let mainWindow = null;
 let reminderWindow = null;
 let statusIconWindow = null;
+let stickyWindow = null;
 let reminderHideTimeout = null;
 const heldKeys = new Set();
 let overlayVisible = false;
@@ -51,6 +62,33 @@ function stopProximityPoll() {
     clearInterval(proximityInterval);
     proximityInterval = null;
   }
+}
+
+function createStickyWindow() {
+  const display = screen.getPrimaryDisplay();
+  const { x: dx, y: dy } = display.workArea;
+  stickyWindow = new BrowserWindow({
+    width: 230,
+    height: 52,
+    minWidth: 0,
+    minHeight: 0,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'sticky-preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+  stickyWindow.setPosition(dx + 16, dy + 80);
+  if (process.platform === 'darwin') {
+    stickyWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    stickyWindow.setAlwaysOnTop(true, 'floating');
+  }
+  stickyWindow.loadFile('sticky.html');
+  stickyWindow.show();
 }
 
 function createStatusIconWindow() {
@@ -285,7 +323,8 @@ ipcMain.handle('set-widget-mode', () => {
   const { x: dx, y: dy } = display.workArea;
   mainWindow.setMinimumSize(0, 0);
   mainWindow.setOpacity(0);
-  mainWindow.setContentBounds({ x: dx + 20, y: dy + 20, width: 160, height: 80 }, false);
+  mainWindow.setSize(180, 140);
+  mainWindow.setPosition(dx + 20, dy + 20);
   startProximityPoll();
   setTimeout(() => mainWindow.setOpacity(1), 80);
   return true;
@@ -326,6 +365,27 @@ ipcMain.handle('show-status-icon', () => {
 
 ipcMain.handle('quit-app', () => {
   app.quit();
+});
+
+ipcMain.handle('get-tasks', () => loadTasks());
+ipcMain.handle('save-tasks', (_e, tasks) => {
+  saveTasks(tasks);
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('task-updated', tasks);
+  return true;
+});
+
+ipcMain.handle('move-sticky', (_e, dx, dy) => {
+  if (!stickyWindow) return;
+  const [x, y] = stickyWindow.getPosition();
+  stickyWindow.setPosition(x + dx, y + dy);
+  return true;
+});
+
+ipcMain.handle('resize-sticky', (_e, w, h) => {
+  if (!stickyWindow) return;
+  stickyWindow.setMinimumSize(0, 0);
+  stickyWindow.setSize(w, h);
+  return true;
 });
 
 ipcMain.handle('get-block-list', () => loadBlockList());
@@ -377,7 +437,7 @@ ipcMain.handle('set-normal-mode', () => {
   stopProximityPoll();
   mainWindow.setMinimumSize(0, 0);
   mainWindow.setOpacity(0);
-  mainWindow.setContentBounds({ x: 0, y: 0, width: 420, height: 430 }, false);
+  mainWindow.setSize(420, 430);
   mainWindow.center();
   setTimeout(() => mainWindow.setOpacity(1), 80);
   return true;
@@ -433,6 +493,7 @@ app.whenReady().then(() => {
   createWindow();
   createReminderWindow();
   createStatusIconWindow();
+  createStickyWindow();
   startWSServer();
 
   // macOS: uiohook-napi requires Accessibility permission to capture global keys
