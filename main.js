@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const { uIOhook, UiohookKey } = require('uiohook-napi');
 const { WebSocketServer } = require('ws');
+const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 
 const SESSIONS_PATH   = path.join(app.getPath('userData'), 'sessions.json');
 const BLOCKLIST_PATH  = path.join(app.getPath('userData'), 'blocklist.json');
@@ -515,6 +517,15 @@ app.whenReady().then(() => {
   } else {
     setupKeyboardHook();
   }
+
+  // Auto-updates: silent background check on launch
+  autoUpdater.logger = log;
+  autoUpdater.logger.transports.file.level = 'info';
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.checkForUpdates().catch(err => {
+    log.error('Auto-update check failed:', err);
+  });
 });
 
 // macOS: re-show status icon if user clicks dock icon (though dock is hidden, handle activate anyway)

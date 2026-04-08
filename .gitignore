@@ -3,4 +3,3 @@ dist/
 sessions.json
 .claude/
 stats-preload.js
-*.blockmap
